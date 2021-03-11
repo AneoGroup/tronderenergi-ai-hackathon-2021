@@ -1,7 +1,6 @@
 # AI Hackathon Challenge - Optimal Control of Microgrid 
 
 ## Introduction
-
 In this challenge you will develop a control system that minimizes the cost of operating a microgrid.
 
 > Microgrid is a small network of electricity users with a local source of supply 
@@ -11,6 +10,14 @@ Microgrids are important for creating sustainable and cost-efficient energy syst
 AI and optimization methods can be used to improve operational efficiency of microgrids. Good control algorithms ensures reliability and cost efficiency.
 
 To develop and test your system you will use a microgrid simulator included in this repository.
+
+## Contents
+1. [Background](##background)
+2. [Task](#task)
+3. [Data description](#data)
+4. [Development environment setup](#development-environment-setup)
+5. [Simulator](#simulator)
+6. [Evaluation](#evaluation)
 
 ## Background
 
