@@ -16,10 +16,10 @@ def _get_hour_resolution(date: datetime) -> datetime:
     return datetime(date.year, date.month, date.day, date.hour)
 
 
-class RyeFlexEnv(gym.Env):  # type: ignore
-    """
-    RyeFlexGym is a simulator of the microgrid dynamics at Rye. Look at
-    description-text for further explanation of this.
+class RyeFlexEnv(gym.Env):
+    """RyeFlexGym is a simulator of the microgrid dynamics at Rye.
+
+    Look at description-text for further explanation of this.
 
     Explanation of the state and action vector is found in states.py
 
@@ -27,7 +27,6 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         _state: The current state of the system.
         _cumulative_reward: The cumulative reward from one episode.
         _time: The current time.
-        metadata: Data about which render modes exist for this env.
         _episode_length: The length of an episode.
         _time_resolution: The time between each step in an episode.
         _charge_loss_battery_storage: The charging loss in the battery storage.
@@ -48,10 +47,10 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         _measured_wind_production_data: Historical data with measured wind production
             in the microgrid.
         _spot_market_price_data: Historical data of spot_market_price.
-        _start_time_data: Start date of the historical data.
-        _end_time_data: End date of the historical data.
-        _episode_end_time: End date of episode
-        _time: The current/now time of the episode
+        _start_date_data: Start date of the historical data.
+        _end_date_data: End date of the historical data.
+        _episode_end_time: End date of episode.
+        metadata: Data about which render modes exist for this env.
     """
 
     _state: State
@@ -70,8 +69,8 @@ class RyeFlexEnv(gym.Env):  # type: ignore
     _state_space_min: State
     _state_space_max: State
 
-    observation_space: gym.spaces.Box
     action_space: gym.spaces.Box
+    observation_space: gym.spaces.Box
 
     _measured_consumption_data: pd.DataFrame
     _measured_pv_production_data: pd.DataFrame
@@ -82,6 +81,8 @@ class RyeFlexEnv(gym.Env):  # type: ignore
     _end_date_data: datetime
     _episode_end_time: datetime
 
+    metadata: Dict[str, List[str]]
+
     def __init__(
         self,
         data: pd.DataFrame,
@@ -91,22 +92,19 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         charge_loss_hydrogen: float = 0.325,
         grid_tariff: float = 0.05,
         peak_grid_tariff: float = 49.0,
-    ):
-        """
-        Initialize the environment
+    ) -> None:
+        """Initialise the environment.
 
-        args:
-            data: Historical data of consumption, wind production,
-             solar (PV) production, spot market price data, etc.
+        Args:
+            data: Historical data of consumption, wind production, solar (PV)
+                production, spot market price data, etc.
             episode_length: The length of an episode.
             random_seed: Optional random seed. It may be used for reproducibility.
-            charge_loss_battery_storage: The charging loss in the battery storage.
-            charge_loss_hydrogen_storage: The charging loss in the hydrogen storage.
-            _energy_grid_tariff: The cost of energy imported from the grid.
-            _peak_grid_tariff: The cost of the peak power imported from the grid.
-
+            charge_loss_battery: The charging loss in the battery storage.
+            charge_loss_hydrogen: The charging loss in the hydrogen storage.
+            grid_tariff: The cost of energy imported from the grid.
+            peak_grid_tariff: The cost of the peak power imported from the grid.
         """
-
         # Init random seed if desired, e.g. for reproducibility.
         self.seed(random_seed)
 
@@ -195,16 +193,14 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         self.reset()
 
     def get_possible_start_times(self) -> List[datetime]:
-        """
-        Return list of possible start_times based on data.
-        """
+        """Return a list of possible ``start_times`` based on data."""
         index = self._measured_pv_production_data.loc[
             : self._end_time_data - self._episode_length
         ].index
         return list(index)
 
     def seed(self, random_seed: Optional[int] = None) -> None:
-        """Sets the seed for this environment's random number generator."""
+        """Set the seed for this environment's random number generator."""
         if random_seed is not None:
             seed(random_seed)
 
@@ -215,16 +211,15 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         hydrogen_storage: float = 0.0,
         grid_import: float = 0.0,
     ) -> np.ndarray:
-        """
-        Resets the environment to an initial state and returns an initial
-        observation.
+        """Reset the environment to its initial state and return an initial observation.
 
-        args:
-            start_time: Optional start time of episode
-            battery_storage: Start level of battery_storage
-            hydrogen_storage: Start level of hydrogen storage
-            grid_import: Start level of grid_import
-        return:
+        Args:
+            start_time: Optional start time of episode.
+            battery_storage: Start level of battery_storage.
+            hydrogen_storage: Start level of hydrogen storage.
+            grid_import: Start level of grid_import.
+
+        Returns:
             state (object): the initial state.
         """
 
@@ -269,12 +264,12 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         action_array: np.ndarray,
         state_current: State,
     ) -> Tuple[State, Action]:
-        """
-        Calculate the new states by performing an action on the environment.
+        """Calculate the new states by performing an action on the environment.
 
-        args:
+        Args:
             action: The action used to generate the new state.
-        return:
+
+        Returns:
             state_new: The new state, based on current state and action.
             action: The action actually performed in the env.
         """
@@ -286,7 +281,7 @@ class RyeFlexEnv(gym.Env):  # type: ignore
             a_max=self._action_space_max.vector,
         )
 
-        action = Action.from_vector(saturated_action_vector)
+        action = Action.from_vector(cast(np.ndarray, saturated_action_vector))
 
         # Get data for the current timestep
         consumption_new = self._measured_consumption_data.loc[self._time]
@@ -329,10 +324,10 @@ class RyeFlexEnv(gym.Env):  # type: ignore
             action.charge_hydrogen = max(discharge_hydrogen, action.charge_hydrogen)
 
         if action.charge_battery < 0:
-            discharge_hydrogen = float(
-                hydrogen_storage_new - state_current.hydrogen_storage
+            discharge_battery = float(
+                battery_storage_new - state_current.battery_storage
             )
-            action.charge_hydrogen = max(discharge_hydrogen, action.charge_hydrogen)
+            action.charge_battery = max(discharge_battery, action.charge_battery)
 
         # Calculate power which can be used towards consumption in the microgrid
         power_in_microgrid_new = (
@@ -366,13 +361,13 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         return new_states, action
 
     def _reward(self, state: State, done: bool) -> float:
-        """
-        Return reward of being in a state.
+        """Return reward of being in a state.
 
-        args:
+        Args:
             state: A state.
-        return:
-            reward: reward of being in the state.
+
+        Returns:
+            reward: Reward of being in the state.
         """
 
         power = (state.spot_market_price + self._grid_tariff) * state.grid_import
@@ -389,15 +384,16 @@ class RyeFlexEnv(gym.Env):  # type: ignore
     def step(
         self, action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, Dict[str, Any]]:
-        """
-        Run one-time step of the environment's dynamics. When the end of
-        the episode is reached, the environments states are reset.
+        """Run one-time step of the environment's dynamics.
 
-        args:
-            action (object): an action provided by the agent.
-        return:
-            observation (object): agent's observation of the current environment.
-            reward (float): the amount of _reward returned after the previous action.
+        When the end of the episode is reached, the environments states are reset.
+
+        Args:
+            action (object): An action provided by the agent.
+
+        Returns:
+            observation (object): Agent's observation of the current environment.
+            reward (float): The amount of _reward returned after the previous action.
             done (bool): Whether the episode has ended, in which case further step()
                 calls will return undefined results.
             info (dict): Contains auxiliary state information.
@@ -437,12 +433,12 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         return new_state.vector, reward, done, info
 
     def render(self, mode: str = "ansi") -> str:
-        """
-        Renders the environment.
+        """Render the environment.
 
-        args:
-            mode (str): the mode to render with.
-        return:
+        Args:
+            mode (str): The mode to render with.
+
+        Returns:
             Supported mode: ansi:
                 Return a string (str) containing a terminal-style text representation.
                 The text can include newlines and ANSI escape sequences
