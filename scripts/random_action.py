@@ -15,7 +15,7 @@ from rye_flex_env.plotter import RyeFlexEnvEpisodePlotter
 
 
 class RandomActionAgent:
-    def __init__(self, action_space: gym.spaces.Box):
+    def __init__(self, action_space: gym.spaces.Box) -> None:
         self._action_space = action_space
 
     def get_action(self) -> np.ndarray:
@@ -23,18 +23,17 @@ class RandomActionAgent:
         Normally one would take state as input, and select action based on this.
         Since we are taking random action here, knowing the stat is not necessary.
         """
+        action: np.ndarray = self._action_space.sample()
+        return action
 
-        return self._action_space.sample()
 
-
-if __name__ == "__main__":
-
+def main() -> None:
     data = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
     env = RyeFlexEnv(data)
 
     agent = RandomActionAgent(action_space=env.action_space)
     plotter = RyeFlexEnvEpisodePlotter()
-    info = None
+    info = {}
     done = False
 
     while not done:
@@ -44,3 +43,7 @@ if __name__ == "__main__":
 
     print(f"Your score is: {info['cumulative_reward']}")
     plotter.plot_episode()
+
+
+if __name__ == "__main__":
+    main()

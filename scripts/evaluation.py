@@ -20,12 +20,11 @@ class RandomActionAgent:
         Normally one would take state as input, and select action based on this.
         Since we are taking random action here, knowing the stat is not necessary.
         """
+        action: np.ndarray = self._action_space.sample()
+        return action
 
-        return self._action_space.sample()
 
-
-if __name__ == "__main__":
-
+def main() -> None:
     data = pd.read_csv("data/test.csv", index_col=0, parse_dates=True)
     env = RyeFlexEnv(data=data)
     env.reset(start_time=datetime(2021, 2, 1, 0, 0))
@@ -35,6 +34,7 @@ if __name__ == "__main__":
     agent = RandomActionAgent(env.action_space)
 
     # Example with random initial state
+    info = {}
     done = False
 
     while not done:
@@ -49,3 +49,7 @@ if __name__ == "__main__":
     print(f"Your test score is: {info['cumulative_reward']}")
 
     plotter.plot_episode()
+
+
+if __name__ == "__main__":
+    main()

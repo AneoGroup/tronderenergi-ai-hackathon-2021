@@ -5,10 +5,9 @@ import numpy as np
 
 @dataclass
 class Action:
-    """
-    The action vector.
+    """The action vector.
 
-    args:
+    Args:
         charge_battery [kWh/h]: If value is:
             - Positive -> store energy in battery.
             - Negative -> discharged energy from battery and use in microgrid.
@@ -40,10 +39,9 @@ class Action:
 
 @dataclass
 class State:
-    """
-    The state vector.
+    """The state vector.
 
-    args:
+    Args:
         consumption [kWh/h]: Consumption in the microgrid.
         wind_production [kWh/h]: Power production from solar used in the microgrid.
         pv_production [kWh/h]: Power production from solar wind used in the microgrid.

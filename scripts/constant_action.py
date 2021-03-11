@@ -30,8 +30,7 @@ class ConstantActionAgent:
         return np.array([1, 1])
 
 
-if __name__ == "__main__":
-
+def main() -> None:
     data = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
 
     env = RyeFlexEnv(data=data)
@@ -39,7 +38,7 @@ if __name__ == "__main__":
     agent = ConstantActionAgent()
 
     # Example with random initial state
-    info = None
+    info = {}
     done = False
 
     while not done:
@@ -66,3 +65,7 @@ if __name__ == "__main__":
 
     print(f"Your score is: {info['cumulative_reward']}")
     plotter.plot_episode()
+
+
+if __name__ == "__main__":
+    main()
