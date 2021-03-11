@@ -141,12 +141,21 @@ Activate environment in the terminal:
 conda activate rye-flex-env
 ```
 
-After activation, you can install packages you need in this environment with `pip install` or `conda install`.
-
 Select `rye-flex-env` as your interpreter in your IDE:
 
 - [VS Code](https://code.visualstudio.com/docs/python/environments)
 - [PyCharm](https://www.jetbrains.com/help/pycharm/conda-support-creating-conda-virtual-environment.html)
+
+The environment includes Python packages necessary to run the simulator and load the data.
+To install addition packages use `pip install` or `conda install` commands in 
+the terminal when the environment is activated.
+
+Here are some packages you might consider:
+- [scikit-learn](https://scikit-learn.org/stable) - machine learning 
+- [pyomo](http://www.pyomo.org) - optimization modeling language
+- [pytorch](https://pytorch.org) - machine and deep learning library
+- [stable-baselines3](https://github.com/DLR-RM/stable-baselines3) - reinforcement learning
+- [https://github.com/DEAP/deap] - evolutionary algorithms
 
 ## Simulator
 
