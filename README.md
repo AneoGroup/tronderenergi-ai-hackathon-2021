@@ -8,7 +8,7 @@ In this challenge you will develop a control system that minimizes the cost of o
 > that is usually attached to a centralized grid but is able to function independently.
 
 Microgrids are important for creating sustainable and cost-efficient energy systems based on renewable sources.
-AI and optimization methods can be used to improve operational efficiency of microgrids.
+AI and optimization methods can be used to improve operational efficiency of microgrids. Good control algorithms ensures reliability and cost efficiency.
 
 To develop and test your system you will use a microgrid simulator included in this repository.
 
