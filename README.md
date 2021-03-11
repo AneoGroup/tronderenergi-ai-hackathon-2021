@@ -155,7 +155,7 @@ Here are some packages you might consider:
 - [pyomo](http://www.pyomo.org) - optimization modeling language
 - [pytorch](https://pytorch.org) - machine and deep learning library
 - [stable-baselines3](https://github.com/DLR-RM/stable-baselines3) - reinforcement learning
-- [https://github.com/DEAP/deap] - evolutionary algorithms
+- [deap](https://github.com/DEAP/deap) - evolutionary algorithms
 
 ## Simulator
 
