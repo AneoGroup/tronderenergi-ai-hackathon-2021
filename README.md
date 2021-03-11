@@ -21,10 +21,11 @@ The REMOTE projects goal for Rye Microgrid is to run the system in islanded mode
 
 The system has two sources of generation – a wind turbine and a rack of PV panels. 
 In addition, the system has two storages – a battery for quick response, but with limited storage and losses, 
-and a hydrogen energy system, with slower charge and discharge rates, higher losses and storage capacity. 
+and a hydrogen energy system, with lower charge and discharge rates, higher losses and storage capacity. 
 When you want to charge the hydrogen system, electricity is used to run an electrolyser that makes hydrogen from water and stores the resulting hydrogen in a tank. 
 The process can be reversed by producing electricity from hydrogen using a fuel cell. 
 For simplicity, minimum charging levels and wear- and tear costs are disregarded in this context.
+We also simplify and collect all losses in the conversion process to and from the storages as charge loss. These losses are given as the round trip efficiency in the table below. Thus there are only losses when charging the storages, not when discharging.
 
 Until recently, and in this assignment, the microgrid can draw electricity from the grid, 
 should local production or discharges from storages not be sufficient.
