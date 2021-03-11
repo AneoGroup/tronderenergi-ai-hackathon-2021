@@ -140,7 +140,7 @@ def test_reset():
 
 def test_step_random_state():
     """
-    Test that
+    Test that:
         - The state changes (also when not using when not using reset)
         - The state are in the desired state-space/observation-space
     """
@@ -224,7 +224,7 @@ def test_step_not_import_from_grid():
         losses of 85%, and had an initial state of 0.
     - Hydrogen storage is set to 1670, since we have transformation loss of 50%,
         , and had initial state of 1668 (max = 1670).
-    - Grid import is set to 0, since we have
+    - Grid import is set to 0, since we have:
         load = 2(consumption) + 10 (hydrogen) + 10.0 (battery) = 22
         production= 20 (solar) + 2(wind) = 22,
         grid_import = load - consumption = 0,
@@ -244,26 +244,11 @@ def test_step_not_import_from_grid():
     print(res_new_state)
     assert (ans_new_state.vector == res_new_state.vector).all()
 
-    # Check that actions are calculated correctly (here one should lose 15% and 50%)
-    # but since we have reached max in hydrogen, we only use power up to fully charged
-    # (meaning 2 kWh/h in energy, which takes 4 kWh/h of electrical energy).
-    ans_action_vector = Action(charge_battery=10, charge_hydrogen=4).vector
+    # Check that actions are calculated correctly.
+    # Since all actions where charging, the actions are the same
+    ans_action_vector = Action(charge_battery=10, charge_hydrogen=10).vector
     print(res_action)
     assert (res_action.vector == ans_action_vector).all()
-
-    # Question: This math is no longer true, so dropped it from the test,
-    # but feel it would be nice to have in the test, but did not have time
-    # to think through how to add it.
-    """Check that total available power in the microgrid are correct
-    #res_power_in_microgrid = (
-    #    res_new_state.wind_production
-    #    + res_new_state.pv_production
-    #    + res_action.charge_battery
-    #    + res_action.charge_hydrogen
-    #) - res_new_state.grid_import
-    # Here we have production of 14 and load of 14.5 and charging of 12.5, meaning
-    # we have 0.5 which is not used in the grid (meaning lost energy).
-    #assert res_power_in_microgrid == 0.5"""
 
     # Check that the reward are the correct value
     assert (
@@ -332,25 +317,11 @@ def test_step_import_from_grid():
     print(res_new_state)
     assert (ans_new_state.vector == res_new_state.vector).all()
 
-    # Check that actions are calculated correctly (here one should lose 0% and 50%)
+    # Check that actions are calculated correctly
+    # charge_hydrogen = 0, since we could not discharge hydrogen due to being empty
     ans_action = Action(charge_hydrogen=0, charge_battery=10)
     print(res_action)
     assert (res_action.vector == ans_action.vector).all()
-
-    # Question: This math is no longer true, so dropped it from the test,
-    # but feel it would be nice to have in the test, but did not have time
-    # to think through how to add it.
-    """# Check that total available power in the microgrid are correct
-    #res_power_in_microgrid = (
-    #    res_new_state.wind_production
-    #    + res_new_state.pv_production
-    #    + res_action.charge_battery
-    #    + res_action.charge_hydrogen
-    #) - res_new_state.grid_import
-    # Here we have production of 14, consumption of 2 and charging of 12.5, meaning
-    # we have 0.5 which is not used in the grid (meaning lost energy).
-    #print(res_power_in_microgrid)
-    #assert res_power_in_microgrid == -4.0"""
 
     assert (
         res_reward
@@ -363,7 +334,7 @@ def test_step_saturation():
     """
     Test where we only look at the saturation of the actions
     """
-    data = pd.read_csv("internal/data/train.csv", index_col=0, parse_dates=True)
+    data = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
     env = RyeFlexEnv(data, charge_loss_hydrogen=0.5)
 
     env.reset(start_time=datetime(2020, 1, 3), battery_storage=400)
@@ -432,7 +403,7 @@ def test_step_new_grid_import_peak_end_of_month():
     """
     Test where we get a new grid import peak, and since it is the
     "end of the month" = episode length,
-    we also get rewrd for grid tariff
+    we also get reward for grid tariff
     """
     data = pd.DataFrame(
         data={
