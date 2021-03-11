@@ -83,6 +83,7 @@ Technical data is found in the table below:
 | |Fuel cell (discharge) capacity|100 KW|
 | |Round trip efficiency|32.5%|
 
+NB: The participants should not change the given environment, but it is encouraged to do feature engineer, reward shaping etc, based on the output from the environment.
 
 ## Data
 Data is stored in `data/train.csv`.
