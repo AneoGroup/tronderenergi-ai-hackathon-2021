@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from random import randrange, seed
-from typing import Dict, List, Optional, Tuple, cast, Any
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import gym
 import numpy as np
@@ -9,7 +9,7 @@ import pandas as pd
 
 from .states import Action, State
 
-logger = logging.getLogger("rye-flex-gym")
+logger = logging.getLogger("rye-flex-env")
 
 
 def _get_hour_resolution(date: datetime) -> datetime:
@@ -20,8 +20,6 @@ class RyeFlexEnv(gym.Env):  # type: ignore
     """
     RyeFlexGym is a simulator of the microgrid dynamics at Rye. Look at
     description-text for further explanation of this.
-
-    Question: ADD MORE EXPLANATION ?
 
     Explanation of the state and action vector is found in states.py
 
@@ -52,6 +50,8 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         _spot_market_price_data: Historical data of spot_market_price.
         _start_time_data: Start date of the historical data.
         _end_time_data: End date of the historical data.
+        _episode_end_time: End date of episode
+        _time: The current/now time of the episode
     """
 
     _state: State
@@ -80,6 +80,7 @@ class RyeFlexEnv(gym.Env):  # type: ignore
 
     _start_date_data: datetime
     _end_date_data: datetime
+    _episode_end_time: datetime
 
     def __init__(
         self,
@@ -107,8 +108,7 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         """
 
         # Init random seed if desired, e.g. for reproducibility.
-        if random_seed:
-            self.seed(random_seed)
+        self.seed(random_seed)
 
         # Metadata used in render-function (requirement by OpenAiGym):
         self.metadata = {"render.modes": ["ansi"]}
@@ -122,20 +122,19 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         self._charge_loss_hydrogen_storage = charge_loss_hydrogen
 
         # Reward function constants:
-        # Possible update, is to change between summer and winter time prices.
-        # Currently we assume assume winter prices from peak priced grid
+        # Currently we assume winter prices from peak priced grid
         # https://ts.tensio.no/kunde/nettleie-priser-og-avtaler
         self._grid_tariff = grid_tariff  # kr/KWh
         self._peak_grid_tariff = peak_grid_tariff  # kr/kW/mnd
 
-        # Data
+        # Data:
         self._measured_consumption_data = data.consumption
         self._measured_wind_production_data = data.wind_production
         self._measured_pv_production_data = data.pv_production
 
         self._spot_market_price_data = data.spot_market_price
 
-        # Actions space
+        # Actions space:
         self._action_space_min = Action(
             charge_battery=-400,  # Geometrical of max
             charge_hydrogen=-100,  # Fuel cell capacity
@@ -152,18 +151,15 @@ class RyeFlexEnv(gym.Env):  # type: ignore
             dtype=np.float64,
         )
 
-        # State space
+        # State space:
         self._state_space_min = State(
             consumption=self._measured_consumption_data.min(),
             # Minimum consumption is 0, anything else is measurement noise
-            # Question: Should we set this as a constant value, since we are splitting
-            # in test and training set, or is it beneficial to have it "dynamic".
-            # I have thoughts both for and against..
             wind_production=self._measured_wind_production_data.min(),
             # Minimum production is 0, anything else is measurement noise
             pv_production=self._measured_pv_production_data.min(),
-            spot_market_price=self._spot_market_price_data.min(),
             # Minimum production is 0, anything else is measurement noise
+            spot_market_price=self._spot_market_price_data.min(),
             battery_storage=0,
             hydrogen_storage=0,
             grid_import=0,
@@ -179,21 +175,21 @@ class RyeFlexEnv(gym.Env):  # type: ignore
             battery_storage=500,  # Capacity of battery is 500 Kwh
             hydrogen_storage=1670,  # The tank can hold 100 kg H2, energy density )
             # 33kWh/kg, 50% efficiency
-            grid_import=np.inf,  # Question: Is this okay, or should it be inf..
-            grid_import_peak=np.inf,  # Question: Is this okay, or should it be inf..
+            grid_import=np.inf,
+            grid_import_peak=np.inf,
         )
 
-        # Define observation space (here observation space = state space)
+        # Define observation space (here observation space = state space):
         self.observation_space = gym.spaces.Box(
             low=self._state_space_min.vector,
             high=self._state_space_max.vector,
             dtype=np.float64,
         )
 
-        # The start date of possible simulations
+        # The start date of possible simulations:
         self._start_time_data = data.index.min()
 
-        # The end date of possible simulations
+        # The end date of possible simulations:
         self._end_time_data = data.index.max()
 
         self.reset()
@@ -300,50 +296,43 @@ class RyeFlexEnv(gym.Env):  # type: ignore
 
         # Inflict charging losses from electrical to chemical energy
         if action.charge_battery > 0:
-            action.charge_battery = (
-                self._charge_loss_battery_storage * action.charge_battery
-            )
+            charge_battery = self._charge_loss_battery_storage * action.charge_battery
+        else:
+            charge_battery = action.charge_battery
 
         if action.charge_hydrogen > 0:
-            action.charge_hydrogen = (
+            charge_hydrogen = (
                 self._charge_loss_hydrogen_storage * action.charge_hydrogen
             )
+        else:
+            charge_hydrogen = action.charge_hydrogen
 
         # Constrain battery storage
         battery_storage_new = np.clip(
-            state_current.battery_storage + action.charge_battery,
+            state_current.battery_storage + charge_battery,
             a_min=self._state_space_min.battery_storage,
             a_max=self._state_space_max.battery_storage,
         )
 
         # Constrain hydrogen storage
         hydrogen_storage_new = np.clip(
-            state_current.hydrogen_storage + action.charge_hydrogen,
+            state_current.hydrogen_storage + charge_hydrogen,
             a_min=self._state_space_min.hydrogen_storage,
             a_max=self._state_space_max.hydrogen_storage,
         )
 
-        # If state of storage are increased (charging) -> charging > 0 and
-        #   need to use power from microgrid to charge storage
-        # If state of storage are decreasing (discharging) -> charging < 0 and
-        #   give power from batteries to microgrid
-        action.charge_hydrogen = float(
-            hydrogen_storage_new - state_current.hydrogen_storage
-        )
-        action.charge_battery = float(
-            battery_storage_new - state_current.battery_storage
-        )
+        # Need to ensure we can't discharge more than capabilities of battery:
+        if action.charge_hydrogen < 0:
+            discharge_hydrogen = float(
+                hydrogen_storage_new - state_current.hydrogen_storage
+            )
+            action.charge_hydrogen = max(discharge_hydrogen, action.charge_hydrogen)
 
-        # Need to transform back from chemical energy to electrical energy
-        # if we charged the batteries.
-        if action.charge_battery > 0:
-            action.charge_battery = (
-                action.charge_battery / self._charge_loss_battery_storage
+        if action.charge_battery < 0:
+            discharge_hydrogen = float(
+                hydrogen_storage_new - state_current.hydrogen_storage
             )
-        if action.charge_hydrogen > 0:
-            action.charge_hydrogen = (
-                action.charge_hydrogen / self._charge_loss_hydrogen_storage
-            )
+            action.charge_hydrogen = max(discharge_hydrogen, action.charge_hydrogen)
 
         # Calculate power which can be used towards consumption in the microgrid
         power_in_microgrid_new = (
@@ -362,7 +351,6 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         # Calculate new peak
         grid_import_peak_new = max(state_current.grid_import_peak, grid_import_new)
 
-        # Question: Should power_in_microgrid be added as a state?
         new_states = State(
             consumption=consumption_new,
             wind_production=wind_production_new,
@@ -386,10 +374,6 @@ class RyeFlexEnv(gym.Env):  # type: ignore
         return:
             reward: reward of being in the state.
         """
-
-        # Question: We could return the sub-rewards, power and peak, and plot it
-        # to the students?
-        # Could it be beneficial for the students ?
 
         power = (state.spot_market_price + self._grid_tariff) * state.grid_import
 

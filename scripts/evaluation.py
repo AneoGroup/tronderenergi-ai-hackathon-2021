@@ -35,7 +35,6 @@ if __name__ == "__main__":
     agent = RandomActionAgent(env.action_space)
 
     # Example with random initial state
-    info = None
     done = False
 
     while not done:

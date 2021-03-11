@@ -89,7 +89,7 @@ Data is stored in `data/train.csv`.
 It contains production and consumption measures and weather parameters for every hour of the training period.
 This data you can use in the development of the controller.
 
-Later in the event you will get `data/train.csv` for the test period used in final evaluation.
+Later in the event you will get `data/test.csv` for the test period used in final evaluation.
 It has the same parameters but for another period. 
 You should only use it in for running the evaluation script to get the final score.
 
@@ -166,9 +166,9 @@ Happy hacking!
 Evaluation will be done with the evaluation script `scripts/evaluation.py`.
 It uses `data/test.csv` data file that will be shared with the participants on Sunday morning.
 The participants are expected to add the code for using their system agent in this script 
-and then run it once to get the score. 
-Don't modify the reward function or do it in a way to preserve the original cumulative reward.
-The score should be included in your presentation.
+and then run it once to get the score (cumulative reward) at the end. 
+Don't modify the reward function, or do it in a way such that one preserve the original cumulative reward.
+The score (cumulative reward) should be included in your presentation.
 Also the code to reproduce both training and testing of your system should be packaged (zipped) 
 and sent to the organizers (provide email).
 
