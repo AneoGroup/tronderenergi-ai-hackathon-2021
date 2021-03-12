@@ -51,7 +51,7 @@ def main() -> None:
 
         plotter.update(info)
 
-    print(f"Your score is: {info['cumulative_reward']}")
+    print(f"Your score is: {info['cumulative_reward']} NOK")
     plotter.plot_episode()
 
     # Example where environment are reset
@@ -65,7 +65,7 @@ def main() -> None:
 
         plotter.update(info)
 
-    print(f"Your score is: {info['cumulative_reward']}")
+    print(f"Your score is: {info['cumulative_reward']} NOK")
     plotter.plot_episode()
 
 

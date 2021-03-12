@@ -49,7 +49,7 @@ def main() -> None:
 
         plotter.update(info)
 
-    print(f"Your test score is: {info['cumulative_reward']}")
+    print(f"Your test score is: {info['cumulative_reward']} NOK")
 
     plotter.plot_episode()
 

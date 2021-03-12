@@ -44,7 +44,7 @@ def main() -> None:
         state, reward, done, info = env.step(action)
         plotter.update(info)
 
-    print(f"Your score is: {info['cumulative_reward']}")
+    print(f"Your score is: {info['cumulative_reward']} NOK")
     plotter.plot_episode()
 
 
