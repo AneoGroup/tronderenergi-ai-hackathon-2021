@@ -21,18 +21,25 @@ To develop and test your system you will use a microgrid simulator included in t
 
 ## Background
 
-The Rye microgrid is a pilot within the EU research project REMOTE. 
+The [Rye microgrid](https://www.tu.no/artikler/bonde-vegard-hoem-skal-bli-sin-egen-energi-oy/475603) is a pilot within the EU research project REMOTE. 
 It is a small microgrid placed at Langørgen, Rye just outside of Trondheim, 
 and is a small energy system designed to supply electricity to a modern farm and three households. 
-The REMOTE projects goal for Rye Microgrid is to run the system in islanded mode.
+The REMOTE projects goal for Rye Microgrid is to run the system offgrid, meaning no connection to the local/national grid (also called [island-mode](https://www.sciencedirect.com/topics/engineering/islanded-mode)) .
 
-The system has two sources of generation – a wind turbine and a rack of PV panels. 
-In addition, the system has two storages – a battery for quick response, but with limited storage and losses, 
-and a hydrogen energy system, with lower charge and discharge rates, higher losses and storage capacity. 
+The system has two sources of generation:
+  - A wind turbine.
+  - A rack of photovoltaics (PV) panels.
+  
+In addition, the system has two storages:
+  - A battery for quick response, but with limited storage and [conversion losses](https://en.wikipedia.org/wiki/Energy_conversion_efficiency).
+  - A hydrogen energy system, with lower charge and discharge rates, higher losses and storage capacity. 
+  
 When you want to charge the hydrogen system, electricity is used to run an electrolyser that makes hydrogen from water and stores the resulting hydrogen in a tank. 
 The process can be reversed by producing electricity from hydrogen using a fuel cell. 
 For simplicity, minimum charging levels and wear- and tear costs are disregarded in this context.
-We also simplify and collect all losses in the conversion process to and from the storages as charge loss. These losses are given as the round trip efficiency in the table below. Thus there are only losses when charging the storages, not when discharging.
+We also simplify and collect all losses in the conversion process to and from the storages as charge loss. These losses are given as the round trip efficiency in the table below. Thus there are only losses when charging the storages, not when discharging, and the two storages have the same response time.  To summarize the simplified storages:
+- The battery storage have lower charging conversion losses, but lower storage capacity.
+- The hydrogen storage has higher charging conversion losses, but higher storage capacity.
 
 Until recently, and in this assignment, the microgrid can draw electricity from the grid, 
 should local production or discharges from storages not be sufficient.
@@ -47,8 +54,8 @@ given the uncertainty of future consumption and generation from the wind turbine
 The sole cost element is related to the import of electricity from the grid. 
 The cost of using electricity from the grid has 3 elements:
 - An hourly, variable electricity spot price – given as part of the dataset as NOK/kWh 
-- An energy part of the grid tariff, which is paid per kWh that is imported. In this assignment we use the Tensio winter energy tariff: 0.05 NOK/kWh
-- A peak tariff that is paid monthly, based on the maximum instantaneous power (measured hourly) imported to the microgrid: 49 NOK/month/kWpeak
+- An energy part of the grid tariff, which is paid per kWh that is imported. In this assignment we use constantly the Tensio winter energy tariff: 0.05 NOK/kWh
+- A peak tariff that is paid monthly, based on the highest measured power (peak power) imported to the microgrid in that month: 49 NOK/month/kWpeak
 
 With clever operation of the microgrid, it should be possible to operate the grid as to minimise the cost of the import. 
 Your task is to develop a system that optimise the operation of the storages, 
@@ -58,12 +65,15 @@ The system is operated under the following restrictions:
 
 - Consumption, PV and wind generation are all stochastic variables. 
   These can only be observed, not decided. 
-  Weather (temperature, wind speed, solar radiation e.t.c. is a main driver behind these stochastic processes). 
+  Weather (temperature, wind speed, solar radiation e.t.c.) is a main driver behind these stochastic processes). 
 - Consumption must be met in all timesteps – either through 
   wind generation, pv generation, discharge from storages or import from the grid. 
 - Given that storages are not full, they can be charged by pv or wind generation, or import from the grid. 
   For simplicity, we assume that energy stored is equal to the charging of the system, times the round trip efficiency, 
-  and that the systems can be discharged without any losses. 
+  and that the systems can be discharged without any losses. It is implemented three security measures:
+    - If one tries to charge more than what is possible to store in the storage the excess power will be lost.
+    - If one tries to discharge more than that is stored in the battery, it will only be discharged until the storage is empty.
+    - If one tries to charge more than the limit, the action is saturated.
 - The microgrid is too large to join any current Norwegian prosumer scheme, 
   thus excess production cannot be fed back into the grid. 
   If production is larger than consumption, and all storages full, 
@@ -95,12 +105,12 @@ NB: The participants should not change the given environment, but it is encourag
 
 ## Data
 Data is stored in `data/train.csv`.
-It contains production and consumption measures and weather parameters for every hour of the training period.
+It contains production and consumption measurements and weather parameters for every hour of the training period.
 This data you can use in the development of the controller.
 
-Later in the event you will get `data/test.csv` for the test period used in final evaluation.
+Later in the event you will get `data/test.csv` for the test period used in the final evaluation.
 It has the same parameters but for another period. 
-You should only use it in for running the evaluation script to get the final score.
+You will use it when running the evaluation script to get the final score.
 
 Both files contain the following parameters (columns in the file):
 
