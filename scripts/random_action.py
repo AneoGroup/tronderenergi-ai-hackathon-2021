@@ -27,6 +27,7 @@ class RandomActionAgent:
 
         return self._action_space.sample()
 
+
 def main() -> None:
     root_dir = dirname(abspath(join(__file__, "../")))
     data = pd.read_csv(join(root_dir, "data/train.csv"), index_col=0, parse_dates=True)
@@ -45,3 +46,7 @@ def main() -> None:
 
     print(f"Your score is: {info['cumulative_reward']} NOK")
     plotter.plot_episode()
+
+
+if __name__ == "__main__":
+    main()
