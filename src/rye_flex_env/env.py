@@ -199,6 +199,10 @@ class RyeFlexEnv(gym.Env):
         ].index
         return list(index)
 
+    def get_state_vector(self) -> np.ndarray:
+        """ Returns state vector. """
+        return self._state.vector
+
     def seed(self, random_seed: Optional[int] = None) -> None:
         """Set the seed for this environment's random number generator."""
         if random_seed is not None:

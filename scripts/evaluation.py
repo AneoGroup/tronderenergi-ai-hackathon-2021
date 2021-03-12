@@ -16,7 +16,7 @@ class RandomActionAgent:
     def __init__(self, action_space: gym.spaces.Box):
         self._action_space = action_space
 
-    def get_action(self, state: np.ndarray) -> np.ndarray:
+    def get_action(self) -> np.ndarray:
         """
         Normally one would take state as input, and select action based on this.
         Since we are taking random action here, knowing the stat is not necessary.
@@ -28,7 +28,7 @@ class RandomActionAgent:
 
 def main() -> None:
     root_dir = dirname(abspath(join(__file__, "../")))
-    data = pd.read_csv(join(root_dir, "data/train.csv"), index_col=0, parse_dates=True)
+    data = pd.read_csv(join(root_dir, "data/test.csv"), index_col=0, parse_dates=True)
 
     env = RyeFlexEnv(data=data)
     env.reset(start_time=datetime(2021, 2, 1, 0, 0))
@@ -41,12 +41,12 @@ def main() -> None:
     info = {}
     done = False
     # Initial state
-    state = env._state
+    state = state = env.get_state_vector()
 
     while not done:
 
         # INSERT YOUR OWN ALGORITHM HERE
-        action = agent.get_action(state)
+        action = agent.get_action()
 
         state, reward, done, info = env.step(action)
 

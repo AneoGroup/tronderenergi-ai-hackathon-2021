@@ -12,6 +12,8 @@ AI and optimization methods can be used to improve operational efficiency of mic
 
 To develop and test your system you will use a microgrid simulator included in this repository.
 
+The introduction presentation can be found [here](docs/AI-brAIn-hackaton-2021.pdf).
+
 ## Background
 
 The Rye microgrid is a pilot within the EU research project REMOTE. 
