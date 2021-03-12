@@ -60,7 +60,9 @@ The system is operated under the following restrictions:
   thus excess production cannot be fed back into the grid. 
   If production is larger than consumption, and all storages full, 
   then excess production is curtailed (thrown away).
-- All losses from transformers and distribution lines can be neglected.  
+- All losses from transformers and distribution lines can be neglected.
+
+The mathematical description can be found in this [document](docs/rye_simulator.pdf).
 
 Technical data is found in the table below:
 
@@ -154,7 +156,7 @@ Here are some packages you might find useful:
 
 ## Simulator
 
-This repository includes a microgrid simulator that you will be using for developing and testing your system. 
+This repository includes a microgrid simulator that you will be using for developing and testing your system.
 The simulator is implemented as [OpenAI Gym](https://gym.openai.com/).
 It is recommended to read the [official docs](https://gym.openai.com/docs/#observations) from OpenAI to get familiar with the basic concepts.
 Even though gyms were introduced for training deep reinforcement learning agents, they provide a generic interface for any control system.
