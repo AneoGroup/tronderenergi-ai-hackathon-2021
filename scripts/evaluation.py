@@ -2,6 +2,7 @@
 The test script that will be used for evaluation of the "agents" performance
 """
 from datetime import datetime
+from os.path import abspath, dirname, join
 
 import gym
 import numpy as np
@@ -25,7 +26,9 @@ class RandomActionAgent:
 
 
 def main() -> None:
-    data = pd.read_csv("data/test.csv", index_col=0, parse_dates=True)
+    root_dir = dirname(abspath(join(__file__, "../")))
+    data = pd.read_csv(join(root_dir, "data/train.csv"), index_col=0, parse_dates=True)
+
     env = RyeFlexEnv(data=data)
     env.reset(start_time=datetime(2021, 2, 1, 0, 0))
     plotter = RyeFlexEnvEpisodePlotter()

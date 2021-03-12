@@ -8,6 +8,7 @@ The agent is a simple (and naive agent) and only selects constant actions.
 """
 
 from datetime import datetime
+from os.path import abspath, dirname, join
 
 import numpy as np
 import pandas as pd
@@ -31,7 +32,8 @@ class ConstantActionAgent:
 
 
 def main() -> None:
-    data = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
+    root_dir = dirname(abspath(join(__file__, "../")))
+    data = pd.read_csv(join(root_dir, "data/train.csv"), index_col=0, parse_dates=True)
 
     env = RyeFlexEnv(data=data)
     plotter = RyeFlexEnvEpisodePlotter()

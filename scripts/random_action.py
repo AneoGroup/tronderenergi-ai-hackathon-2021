@@ -5,6 +5,7 @@ where the episode starts with a random initial state.
 The agent is simple (and naive) and selects random actions.
 
 """
+from os.path import abspath, dirname, join
 
 import gym
 import numpy as np
@@ -28,7 +29,9 @@ class RandomActionAgent:
 
 
 def main() -> None:
-    data = pd.read_csv("data/train.csv", index_col=0, parse_dates=True)
+    root_dir = dirname(abspath(join(__file__, "../")))
+    data = pd.read_csv(join(root_dir, "data/train.csv"), index_col=0, parse_dates=True)
+
     env = RyeFlexEnv(data)
 
     agent = RandomActionAgent(action_space=env.action_space)
