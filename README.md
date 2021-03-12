@@ -1,7 +1,8 @@
 # AI Hackathon Challenge - Optimal Control of Microgrid 
 
 ## Introduction
-In this challenge you will develop a control system that minimizes the cost of operating a microgrid.
+
+In this challenge you will develop an operational plan that minimizes the cost for the microgrid owners.
 
 > Microgrid is a small network of electricity users with a local source of supply 
 > that is usually attached to a centralized grid but is able to function independently.
@@ -11,73 +12,55 @@ AI and optimization methods can be used to improve operational efficiency of mic
 
 To develop and test your system you will use a microgrid simulator included in this repository.
 
-## Contents
-1. [Background](##background)
-2. [Task](#task)
-3. [Data description](#data)
-4. [Development environment setup](#development-environment-setup)
-5. [Simulator](#simulator)
-6. [Evaluation](#evaluation)
-
 ## Background
 
-The [Rye microgrid](https://www.tu.no/artikler/bonde-vegard-hoem-skal-bli-sin-egen-energi-oy/475603) is a pilot within the EU research project REMOTE. 
-It is a small microgrid placed at Langørgen, Rye just outside of Trondheim, 
+The Rye microgrid is a pilot within the EU research project REMOTE. 
+It is a small microgrid placed at Langørgen, in the outskirts of Trondheim, 
 and is a small energy system designed to supply electricity to a modern farm and three households. 
-The REMOTE projects goal for Rye Microgrid is to run the system offgrid, meaning no connection to the local/national grid (also called [island-mode](https://www.sciencedirect.com/topics/engineering/islanded-mode)) .
+The REMOTE projects goal for Rye Microgrid is to run the system in islanded mode.
 
-The system has two sources of generation:
-  - A wind turbine.
-  - A rack of photovoltaics (PV) panels.
-  
-In addition, the system has two storages:
-  - A battery for quick response, but with limited storage and [conversion losses](https://en.wikipedia.org/wiki/Energy_conversion_efficiency).
-  - A hydrogen energy system, with lower charge and discharge rates, higher losses and storage capacity. 
-  
+> A microgrid is said to be in islanded mode when it is disconnected from the main grid and 
+> it operates independently with micro sources and load
+
+The system has two sources of generation – a wind turbine and a rack of PV panels. 
+In addition, the system has two storages – a battery with high charge and discharge response, but with limited storage and losses, 
+and a hydrogen energy system, with lower charge and discharge rates, higher losses and storage capacity. 
 When you want to charge the hydrogen system, electricity is used to run an electrolyser that makes hydrogen from water and stores the resulting hydrogen in a tank. 
 The process can be reversed by producing electricity from hydrogen using a fuel cell. 
 For simplicity, minimum charging levels and wear- and tear costs are disregarded in this context.
-We also simplify and collect all losses in the conversion process to and from the storages as charge loss. These losses are given as the round trip efficiency in the table below. Thus there are only losses when charging the storages, not when discharging, and the two storages have the same response time.  To summarize the simplified storages:
-- The battery storage have lower charging conversion losses, but lower storage capacity.
-- The hydrogen storage has higher charging conversion losses, but higher storage capacity.
+We also simplify and collect all losses in the conversion process to and from the storages as charge loss. These losses are given as the round trip efficiency in the table below. Thus there are only losses when charging the storages, not when discharging.
 
-Until recently, and in this assignment, the microgrid can draw electricity from the grid, 
-should local production or discharges from storages not be sufficient.
+Morover, when local production or discharges from storages are not sufficient to cover the demand, the microgrid can draw electricity from
+the grid at some costs.
 
 ![microgrid](docs/microgrid.png)
 
 ## Task
 
 The task of this assignment is to make a control system that minimizes the cost of operation of the microgrid, 
-given the uncertainty of future consumption and generation from the wind turbine and PV.
+given the uncertainty of future consumption and generation from the wind turbine and PV. With clever operation of the microgrid, it should be possible to minimise the cost of grid imports. Your task is to develop a system that optimise the operation of the storages, given limited insight into future PV and wind generation and consumption.
 
-The sole cost element is related to the import of electricity from the grid. 
+The sole cost element is related to the import of electricity from the grid.
 The cost of using electricity from the grid has 3 elements:
-- An hourly, variable electricity spot price – given as part of the dataset as NOK/kWh 
-- An energy part of the grid tariff, which is paid per kWh that is imported. In this assignment we use constantly the Tensio winter energy tariff: 0.05 NOK/kWh
-- A peak tariff that is paid monthly, based on the highest measured power (peak power) imported to the microgrid in that month: 49 NOK/month/kWpeak
-
-With clever operation of the microgrid, it should be possible to operate the grid as to minimise the cost of the import. 
-Your task is to develop a system that optimise the operation of the storages, 
-given limited insight into future PV and wind generation and consumption.
+- An hourly, variable electricity **spot price** – given as part of the dataset as NOK/kWh 
+- An energy part of the **grid tariff**, which is paid per kWh that is imported. In this assignment we use the Tensio winter energy tariff: 0.05 NOK/kWh
+- A **peak tariff** that is paid monthly, based on the maximum instantaneous power (measured hourly) imported to the microgrid: 49 NOK/month/kWpeak
 
 The system is operated under the following restrictions:
 
 - Consumption, PV and wind generation are all stochastic variables. 
   These can only be observed, not decided. 
-  Weather (temperature, wind speed, solar radiation e.t.c.) is a main driver behind these stochastic processes). 
+  Weather (temperature, wind speed, solar radiation e.t.c. is a main driver behind these stochastic processes). 
 - Consumption must be met in all timesteps – either through 
-  wind generation, pv generation, discharge from storages or import from the grid. 
-- Given that storages are not full, they can be charged by pv or wind generation, or import from the grid. 
-  For simplicity, we assume that energy stored is equal to the charging of the system, times the round trip efficiency, 
-  and that the systems can be discharged without any losses. It is implemented three security measures:
-    - If one tries to charge more than what is possible to store in the storage the excess power will be lost.
-    - If one tries to discharge more than that is stored in the battery, it will only be discharged until the storage is empty.
-    - If one tries to charge more than the limit, the action is saturated.
+  wind generation, PV generation, discharge from storages or import from the grid. 
+- Given that storages are not full, they can be charged by PV generation, wind generation, or import from the grid. 
+  For simplicity, we assume that the energy being stored is equal to the charging of the storage units times the round trip efficiency, 
+  and that the systems can be discharged without any losses. 
 - The microgrid is too large to join any current Norwegian prosumer scheme, 
   thus excess production cannot be fed back into the grid. 
   If production is larger than consumption, and all storages full, 
-  then excess production is curtailed (thrown away). 
+  then excess production is curtailed (thrown away).
+- All losses from transformers and distribution lines can be neglected.  
 
 Technical data is found in the table below:
 
@@ -101,16 +84,15 @@ Technical data is found in the table below:
 | |Fuel cell (discharge) capacity|100 KW|
 | |Round trip efficiency|32.5%|
 
-NB: The participants should not change the given environment, but it is encouraged to do feature engineer, reward shaping etc, based on the output from the environment.
 
 ## Data
 Data is stored in `data/train.csv`.
-It contains production and consumption measurements and weather parameters for every hour of the training period.
+It contains production and consumption measures and weather parameters for every hour of the training period.
 This data you can use in the development of the controller.
 
-Later in the event you will get `data/test.csv` for the test period used in the final evaluation.
+Later in the event you will get `data/train.csv` for the test period used in final evaluation.
 It has the same parameters but for another period. 
-You will use it when running the evaluation script to get the final score.
+You should only use it in for running the evaluation script to get the final score.
 
 Both files contain the following parameters (columns in the file):
 
@@ -118,7 +100,7 @@ Both files contain the following parameters (columns in the file):
 - `wind_production` - production from wind turbine in kWh/h
 - `consumption` - consumption in kWh/h
 - `spot_market_price` - energy price per NOK/kWh
-- `precip_1h:mm` - amount of rainfall in millimeters that has fallen during the indicated interval.
+- `precip_1h:mm` - amount of rainfalsl in millimeters that has fallen during the indicated interval.
 - `precip_type:idx` - integer indicating the precipitation type (
   0 - none, 
   1 - rain, 
@@ -158,21 +140,12 @@ Activate environment in the terminal:
 conda activate rye-flex-env
 ```
 
+After activation, you can install packages you need in this environment with `pip install` or `conda install`.
+
 Select `rye-flex-env` as your interpreter in your IDE:
 
 - [VS Code](https://code.visualstudio.com/docs/python/environments)
 - [PyCharm](https://www.jetbrains.com/help/pycharm/conda-support-creating-conda-virtual-environment.html)
-
-The environment includes Python packages necessary to run the simulator and load the data.
-To install addition packages use `pip install` or `conda install` commands in 
-the terminal when the environment is activated.
-
-Here are some packages you might consider:
-- [scikit-learn](https://scikit-learn.org/stable) - machine learning 
-- [pyomo](http://www.pyomo.org) - optimization modeling language
-- [pytorch](https://pytorch.org) - machine and deep learning library
-- [stable-baselines3](https://github.com/DLR-RM/stable-baselines3) - reinforcement learning
-- [deap](https://github.com/DEAP/deap) - evolutionary algorithms
 
 ## Simulator
 
@@ -194,9 +167,9 @@ Happy hacking!
 Evaluation will be done with the evaluation script `scripts/evaluation.py`.
 It uses `data/test.csv` data file that will be shared with the participants on Sunday morning.
 The participants are expected to add the code for using their system agent in this script 
-and then run it once to get the score (cumulative reward) at the end. 
-Don't modify the reward function, or do it in a way such that one preserve the original cumulative reward.
-The score (cumulative reward) should be included in your presentation.
+and then run it once to get the score. 
+Don't modify the reward function or do it in a way to preserve the original cumulative reward.
+The score should be included in your presentation.
 Also the code to reproduce both training and testing of your system should be packaged (zipped) 
 and sent to the organizers (provide email).
 
