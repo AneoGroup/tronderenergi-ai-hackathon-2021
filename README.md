@@ -183,7 +183,7 @@ Evaluation criteria:
   - Method selection​
   - System design​
   - System implementation​
-Presentation​
+- Presentation​
   - Show your score​
   - Plots with actions and environment state​
   - Explanation and justification of choices made
