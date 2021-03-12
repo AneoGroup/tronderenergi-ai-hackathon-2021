@@ -145,29 +145,25 @@ Both files contain the following parameters (columns in the file):
 
 ## Development environment setup
 
-Install miniconda for Python 3.8 64-bit from the [official page](https://docs.conda.io/en/latest/miniconda.html).
+This setup should work in Windows, Max and Linux.
 
-Setup conda environment defined in `environment.yaml`:
+1. Install miniconda for Python 3.8 64-bit from the [official page](https://docs.conda.io/en/latest/miniconda.html).
+2. Setup conda environment defined in `environment.yaml`:
 ```sh
 conda env create -f environment.yaml
 ```
-
-Activate environment in the terminal:
-
+3. Activate environment in the terminal:
 ```sh
 conda activate rye-flex-env
 ```
-
-Select `rye-flex-env` as your interpreter in your IDE:
-
+4. Select `rye-flex-env` as your interpreter in your IDE:
 - [VS Code](https://code.visualstudio.com/docs/python/environments)
 - [PyCharm](https://www.jetbrains.com/help/pycharm/conda-support-creating-conda-virtual-environment.html)
 
+5. To install addition packages use `pip install` or `conda install` commands in 
+the terminal when the environment is activated. 
 The environment includes Python packages necessary to run the simulator and load the data.
-To install addition packages use `pip install` or `conda install` commands in 
-the terminal when the environment is activated.
-
-Here are some packages you might consider:
+Here are some packages you might find useful:
 - [scikit-learn](https://scikit-learn.org/stable) - machine learning 
 - [pyomo](http://www.pyomo.org) - optimization modeling language
 - [pytorch](https://pytorch.org) - machine and deep learning library
