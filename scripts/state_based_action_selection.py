@@ -16,10 +16,10 @@ import pandas as pd
 
 from rye_flex_env.env import RyeFlexEnv
 from rye_flex_env.plotter import RyeFlexEnvEpisodePlotter
-from rye_flex_env.states import State
+from rye_flex_env.states import State, Action
 
 
-class ConstantActionAgent:
+class SimpleStateBasedAgent:
     """
     An agent which always returns a constant action
     """
@@ -38,7 +38,8 @@ class ConstantActionAgent:
 
         if total_production > 30:
             # Charging battery with 10 kWh/h and hydrogen with 0 kWh/h
-            return np.array([10, 0])
+            action = Action(charge_battery=10, charge_hydrogen=0)
+            return action.vector
         else:
             # Charging battery with 0 kWh/h and hydrogen with 10 kWh/h
             return np.array([0, 10])
@@ -50,7 +51,7 @@ def main() -> None:
 
     env = RyeFlexEnv(data=data)
     plotter = RyeFlexEnvEpisodePlotter()
-    agent = ConstantActionAgent()
+    agent = SimpleStateBasedAgent()
 
     # Get initial state
     state = env.get_state_vector()
@@ -58,7 +59,6 @@ def main() -> None:
     done = False
 
     while not done:
-
         action = agent.get_action(state)
 
         state, reward, done, info = env.step(action)
@@ -67,7 +67,6 @@ def main() -> None:
 
     print(f"Your score is: {info['cumulative_reward']} NOK")
     plotter.plot_episode()
-
 
 
 if __name__ == "__main__":
