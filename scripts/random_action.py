@@ -16,7 +16,7 @@ from rye_flex_env.plotter import RyeFlexEnvEpisodePlotter
 
 
 class RandomActionAgent:
-    def __init__(self, action_space: gym.spaces.Box) -> None:
+    def __init__(self, action_space: gym.spaces.Box):
         self._action_space = action_space
 
     def get_action(self) -> np.ndarray:
@@ -24,9 +24,8 @@ class RandomActionAgent:
         Normally one would take state as input, and select action based on this.
         Since we are taking random action here, knowing the stat is not necessary.
         """
-        action: np.ndarray = self._action_space.sample()
-        return action
 
+        return self._action_space.sample()
 
 def main() -> None:
     root_dir = dirname(abspath(join(__file__, "../")))
@@ -36,7 +35,7 @@ def main() -> None:
 
     agent = RandomActionAgent(action_space=env.action_space)
     plotter = RyeFlexEnvEpisodePlotter()
-    info = {}
+    info = None
     done = False
 
     while not done:
@@ -46,7 +45,3 @@ def main() -> None:
 
     print(f"Your score is: {info['cumulative_reward']}")
     plotter.plot_episode()
-
-
-if __name__ == "__main__":
-    main()
