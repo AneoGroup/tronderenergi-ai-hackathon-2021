@@ -173,8 +173,8 @@ The participants are expected to add the code for using their system agent in th
 and then run it once to get the score. 
 Don't modify the reward function or do it in a way to preserve the original cumulative reward.
 The score should be included in your presentation.
-Also the code to reproduce both training and testing of your system should be packaged (zipped) 
-and sent to the organizers (provide email).
+Also the code to reproduce both training and testing of your system should be pushed to your team GitHub repo
+and shared with the judges.
 
 Evaluation criteria:
 - Score = cumulative reward for test period​
