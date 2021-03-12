@@ -38,6 +38,8 @@ def main() -> None:
     plotter = RyeFlexEnvEpisodePlotter()
     info = {}
     done = False
+    # Initial state
+    state = env._state
 
     while not done:
         action = agent.get_action()

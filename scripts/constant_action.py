@@ -28,7 +28,11 @@ class ConstantActionAgent:
         Since we are taking random action here, knowing the stat is not necessary.
         """
 
-        return np.array([1, 1])
+        """
+        First entry = battery charge/discharge
+        and second entry = hydrogen charge/discharge
+        """
+        return np.array([1, 0])
 
 
 def main() -> None:
@@ -42,6 +46,8 @@ def main() -> None:
     # Example with random initial state
     info = {}
     done = False
+    # Initial state
+    state = env._state
 
     while not done:
 
