@@ -31,17 +31,16 @@ def main() -> None:
     data = pd.read_csv(join(root_dir, "data/test.csv"), index_col=0, parse_dates=True)
 
     env = RyeFlexEnv(data=data)
-    env.reset(start_time=datetime(2021, 2, 1, 0, 0))
     plotter = RyeFlexEnvEpisodePlotter()
+
+    # Reset episode to feb 2021, and get initial state
+    state = env.reset(start_time=datetime(2021, 2, 1, 0, 0))
 
     # INSERT YOUR OWN ALGORITHM HERE
     agent = RandomActionAgent(env.action_space)
 
-    # Example with random initial state
     info = {}
     done = False
-    # Initial state
-    state = state = env.get_state_vector()
 
     while not done:
 
