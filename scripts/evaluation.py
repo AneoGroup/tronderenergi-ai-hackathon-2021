@@ -10,20 +10,33 @@ import pandas as pd
 
 from rye_flex_env.env import RyeFlexEnv
 from rye_flex_env.plotter import RyeFlexEnvEpisodePlotter
+from rye_flex_env.states import State, Action
 
 
-class RandomActionAgent:
-    def __init__(self, action_space: gym.spaces.Box):
-        self._action_space = action_space
+class SimpleStateBasedAgent:
+    """
+    An example agent which always returns a constant action
+    """
 
-    def get_action(self) -> np.ndarray:
+    def get_action(self, state_vector: np.ndarray) -> np.ndarray:
         """
-        Normally one would take state as input, and select action based on this.
+        Normally one would take the state as input, and select action based on this.
         Since we are taking random action here, knowing the stat is not necessary.
         """
 
-        action: np.ndarray = self._action_space.sample()
-        return action
+        # Convert from numpy array to State:
+        state = State.from_vector(state_vector)
+
+        # Create a state for total production:
+        total_production = state.pv_production + state.wind_production
+
+        if total_production > 30:
+            # Charging battery with 10 kWh/h and hydrogen with 0 kWh/h
+            action = Action(charge_battery=10, charge_hydrogen=0)
+            return action.vector
+        else:
+            # Charging battery with 0 kWh/h and hydrogen with 10 kWh/h
+            return np.array([0, 10])
 
 
 def main() -> None:
@@ -37,7 +50,7 @@ def main() -> None:
     state = env.reset(start_time=datetime(2021, 2, 1, 0, 0))
 
     # INSERT YOUR OWN ALGORITHM HERE
-    agent = RandomActionAgent(env.action_space)
+    agent = SimpleStateBasedAgent()
 
     info = {}
     done = False
@@ -45,7 +58,7 @@ def main() -> None:
     while not done:
 
         # INSERT YOUR OWN ALGORITHM HERE
-        action = agent.get_action()
+        action = agent.get_action(state)
 
         state, reward, done, info = env.step(action)
 
