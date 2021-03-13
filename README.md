@@ -94,7 +94,7 @@ Data is stored in `data/train.csv`.
 It contains production and consumption measures and weather parameters for every hour of the training period.
 This data you can use in the development of the controller.
 
-Later in the event you will get `data/train.csv` for the test period used in final evaluation.
+Later in the event you will get `data/test.csv` for the test period used in final evaluation.
 It has the same parameters but for another period. 
 You should only use it in for running the evaluation script to get the final score.
 
@@ -127,6 +127,8 @@ Both files contain the following parameters (columns in the file):
 - `dew_point_(2|10|50|100)m:C` - instantaneous value of the dew point temperature in Celsius at 2, 10, 50 or 100 meters above ground.
 - `wind_speed_(2|10|50|100)m:ms` - wind speed in meters per second at 2, 10, 50 or 100 meters above ground.
 - `wind_dir_(2|10|50|100)m:d` - wind direction in degrees at 2, 10, 50 or 100 meters above ground.
+
+All timestamps in the data are stored in UTC (Coordinated Universal Time).
 
 ## Guidelines for using the data
 
