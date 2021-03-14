@@ -242,10 +242,6 @@ def main() -> None:
         plotter.update(info)
 
     print(f"Your test score is: {info['cumulative_reward']} NOK")
-
-    #plt.plot(agent.charge_battery)
-    #plt.plot(agent.charge_hydrogen)
-    # _states = pd.DataFrame(self._states, index=self._times)
     plotter.plot_episode( )
 
 
