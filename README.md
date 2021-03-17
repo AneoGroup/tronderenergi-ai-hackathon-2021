@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this challenge you will develop an operational plan that minimizes the cost for the microgrid owners.
+In this challenge you will develop a control system that minimizes the cost for the microgrid owners.
 
 > Microgrid is a small network of electricity users with a local source of supply 
 > that is usually attached to a centralized grid but is able to function independently.
