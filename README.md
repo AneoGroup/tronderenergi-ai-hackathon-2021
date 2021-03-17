@@ -201,4 +201,4 @@ Evaluation criteria:
   - Plots with actions and environment state​
   - Explanation and justification of choices made
 
-Happy hacking!
+**Happy hacking!**
