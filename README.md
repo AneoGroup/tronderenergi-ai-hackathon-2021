@@ -99,34 +99,28 @@ It has the same parameters but for another period.
 You should only use it in for running the evaluation script to get the final score.
 
 Both files contain the following parameters (columns in the file):
-
-- `pv_production` - production from solar panels in kWh/h
-- `wind_production` - production from wind turbine in kWh/h
-- `consumption` - consumption in kWh/h
-- `spot_market_price` - energy price per NOK/kWh
-- `precip_1h:mm` - amount of rainfall in millimeters that has fallen during the indicated interval.
-- `precip_type:idx` - integer indicating the precipitation type (
-  0 - none, 
-  1 - rain, 
-  2 - rain and snow mix,
-  3 - snow,
-  4 - sleet,
-  5 - freezing rain,
-  6 - hail)
-- `prob_precip_1h:p` - precipitation probability
-- `clear_sky_rad:W` - instantaneous flux of clear sky radiation in Watts per square meter.
-- `clear_sky_energy_1h:J` - accumulated clear sky flux over the given interval in Joules per square meter.
-- `(diffuse|direct|global)_rad:W` - instantaneous flux of diffuse, direct or global radiation in Watts per square meter.
-- `(diffuse|direct|global)_rad_1h:Wh` - accumulated energy of diffuse, direct or global radiation in Wh per square meter.
-- `sunshine_duration_1h:min` - amount of time the sun was shining within the requested interval.
-- `sun_azimuth:d` - solar azimuth angle defines the sun's relative direction along the local horizon.
-- `sun_elevation:d` - solar elevation angle (angle between the sun and the horizon) gives the position of the sun above the horizon.
-- `(low|medium|high|total|effective)_cloud_cover:p` - amount of cloud cover in percent at different levels in percent.
-- `t_(2|10|50|100):C` - temperature in Celsius at 2, 10, 50 or 100 meters above ground.
-- `relative_humidity_(2|10|50|100)m:p` - instantaneous value of the relative humidity in % at 2, 10, 50 or 100 meters above ground.
-- `dew_point_(2|10|50|100)m:C` - instantaneous value of the dew point temperature in Celsius at 2, 10, 50 or 100 meters above ground.
-- `wind_speed_(2|10|50|100)m:ms` - wind speed in meters per second at 2, 10, 50 or 100 meters above ground.
-- `wind_dir_(2|10|50|100)m:d` - wind direction in degrees at 2, 10, 50 or 100 meters above ground.
+|Paramemter|Description|
+|---|---|
+|`pv_production`|production from solar panels in kWh/h|
+|`wind_production`|production from wind turbine in kWh/h|
+|`consumption`|consumption in kWh/h|
+|`spot_market_price`|energy price per NOK/kWh|
+|`precip_1h:mm`|amount of rainfall in millimeters that has fallen during the indicated interval|
+|`precip_type:idx`|integer indicating the precipitation type (0 - none, 1 - rain, 2 - rain and snow mix, 3 - snow, 4 - sleet, 5 - freezing rain, 6 - hail)|
+|`prob_precip_1h:p`|precipitation probability|
+|`clear_sky_rad:W`|instantaneous flux of clear sky radiation in Watts per square meter|
+|`clear_sky_energy_1h:J`|accumulated clear sky flux over the given interval in Joules per square meter|
+|`(diffuse\|direct\|global)_rad:W`|instantaneous flux of diffuse, direct or global radiation in Watts per square meter|
+|`(diffuse\|direct\|global)_rad_1h:Wh`|accumulated energy of diffuse, direct or global radiation in Wh per square meter|
+|`sunshine_duration_1h:min`|amount of time the sun was shining within the requested interval|
+|`sun_azimuth:d`|solar azimuth angle defines the sun's relative direction along the local horizon|
+|`sun_elevation:d`|solar elevation angle (angle between the sun and the horizon) gives the position of the sun above the horizon|
+|`(low\|medium\|high\|total\|effective)_cloud_cover:p`|amount of cloud cover in percent at different levels in percent|
+|`t_(2\|10\|50\|100):C`|temperature in Celsius at 2, 10, 50 or 100 meters above ground|
+|`relative_humidity_(2\|10\|50\|100)m:p`|instantaneous value of the relative humidity in % at 2, 10, 50 or 100 meters above ground|
+|`dew_point_(2\|10\|50\|100)m:C`|instantaneous value of the dew point temperature in Celsius at 2, 10, 50 or 100 meters above ground|
+|`wind_speed_(2\|10\|50\|100)m:ms`|wind speed in meters per second at 2, 10, 50 or 100 meters above ground|
+|`wind_dir_(2\|10\|50\|100)m:d`|wind direction in degrees at 2, 10, 50 or 100 meters above ground|
 
 All timestamps in the data are stored in UTC (Coordinated Universal Time).
 
